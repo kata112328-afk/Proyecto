@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrainBro — Plataforma Educativa</title>
+  <meta name="description"
+    content="BrainBro: plataforma de seguimiento académico y actividades educativas para orientadoras, coordinadores, estudiantes y padres.">
+  <link rel="icon" href="logo.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../style/styles.css">
+</head>
+
+<body>
+
+  <!-- ============ Pantalla de inicio de sesión ============ -->
+  <div id="pantalla-login" class="login">
+    <aside class="login-marca">
+      <div class="marca-fila">
+        <img src="../imagen/logo.jpeg" alt="Logo BrainBro" class="logo-chico">
+        <span class="marca-nombre">BrainBro</span>
+      </div>
+      <div>
+        <h1 class="marca-titulo">Acompaña el progreso de cada estudiante</h1>
+        <p class="marca-texto">
+          Seguimiento de casos, alertas tempranas, reportes y actividades
+          educativas para grados 7°, 8° y 9°. Todo en una sola plataforma.
+        </p>
+        <ul class="marca-lista">
+          <li><span class="punto"></span> Registro y seguimiento de estudiantes</li>
+          <li><span class="punto"></span> Alertas y notificaciones automáticas</li>
+          <li><span class="punto"></span> Reportes gráficos de progreso</li>
+          <li><span class="punto"></span> Quizzes por materia, grado y área</li>
+        </ul>
+      </div>
+      <p class="marca-pie">Proyecto formativo SENA · Análisis y Desarrollo de Software · Ficha 3351732</p>
+    </aside>
+
+    <main class="login-form">
+      <div class="login-caja">
+        <div class="marca-fila movil">
+          <img src="../imagen/logo.jpeg" alt="Logo BrainBro" class="logo-chico">
+          <span class="marca-nombre oscuro">BrainBro</span>
+        </div>
+        <h2 class="login-titulo">Iniciar sesión</h2>
+        <p class="login-sub">Ingresa con las credenciales asignadas por el administrador.</p>
+
+        <form id="form-login" class="formulario" novalidate>
+          <div class="campo">
+            <label for="correo">Usuario</label>
+            <input id="correo" name="correo" type="email" placeholder="nombre@colegio.edu.co">
+          </div>
+          <div class="campo">
+            <label for="clave">Contraseña</label>
+            <input id="clave" name="clave" type="password" placeholder="••••••••">
+          </div>
+          <div class="campo">
+            <label for="rol">Rol</label>
+            <select id="rol" name="rol">
+              <option>Profesores</option>
+              <option>Coordinador</option>
+              <option>Estudiante</option>
+              <option>Padre/Acudiente</option>
+            </select>
+          </div>
+          <p id="login-error" class="mensaje-error oculto"></p>
+          <button type="submit" class="boton boton-primario boton-ancho">Ingresar a la plataforma</button>
+        </form><br>
+
+        <button type="button" id="Abrir Registro" class="boton abrir registro">Registrarse</button>
+        <a href="#" class="enlace-centro">¿Olvidaste tu contraseña?</a>
+        <div id="modalregistro" class="modal-oculto">
+            <div class="modal-contenido">
+              <div class="modal-header">
+                <h2>Registro de usuario</h2>
+                <button id="cerrar-registro" class="cerrar">&times;</button>
+              </div>
+              <p>Complete los siguientes datos para registrarse</p>
+              <!-- Formulario de registro -->
+              <form id="form-registro">
+                <div class="form-registro">
+                  <label>Nombre completo</label>
+                  <input class="entrada" type="text" id="nombre" name="nombre" placeholder="Nombre completo" required>
+                </div>
+                <div class="form-registro">
+                  <label>Documento</label>
+                  <input class="entrada" type="int" id="documento" placeholder="Documento" required>
+                </div>
+                <div class="form-registro">
+                  <label>Grado</label>
+                  <input class="entrada" type="text" id="Grado" placeholder="Grado" required>
+                </div>
+                <div class="form-registro">
+                  <label>Correo electrónico</label>
+                  <input class="entrada" type="email" id="correo-registro" name="correo-registro" placeholder="correo@ejemplo.com">
+                </div>
+                <!-- CONTRASEÑA -->
+                <div class="form-registro">
+                  <label>Contraseña</label>
+                  <input class="entrada" type="password" id="password" placeholder="Minimo 8 caracteres" required>
+                </div>
+                <div class="form-registro">
+                  <label>Confirmar contraseña</label>
+                  <input class="entrada" type="password" id="confirmar password" placeholder="Repite tu contraseña" required>
+                </div>
+                <button type="submit" class="Btn-registro">Guardar</button>
+              </form>
+              
+
+              <div class="modal-footer">
+                <p>¿Ya tienes una cuenta? <a href="#" id="abrir-login">Inicia sesión</a></p>
+              </div>
+            </div>
+        </div>
+
+    </main>
+  </div>
+
+  <!-- ============ Panel principal ============ -->
+  <div id="pantalla-dashboard" class="dashboard oculto">
+    <aside class="sidebar">
+      <div class="sidebar-cabecera">
+        <img src="../imagen/logo.jpeg" alt="Logo BrainBro" class="logo-chico">
+        <div>
+          <p class="marca-nombre oscuro chico">BrainBro</p>
+          <p class="sidebar-sub">Plataforma educativa</p>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav" id="menu-navegacion">
+        <button class="nav-item" data-vista="panel">Panel general</button>
+        <button class="nav-item" data-vista="historial">Historial del estudiante</button>
+        <button class="nav-item" data-vista="reportes">Reportes y progreso</button>
+        <button class="nav-item" data-vista="alertas">Alertas y notificaciones</button>
+        <button class="nav-item" data-vista="actividades">Actividades educativas</button>
+      </nav>
+
+      <div class="sidebar-pie">
+        <p class="usuario-nombre">Elsa Junca</p>
+        <p class="usuario-rol">Orientadora</p>
+        <a href="#" id="enlace-salir" class="enlace-salir">Cerrar sesión</a>
+      </div>
+    </aside>
+
+    <main class="contenido" id="contenido"><!-- Aquí se dibuja cada módulo con JavaScript --></main>
+  </div>
+
+  <script src="../js/data.js"></script>
+  <script src="../js/app.js"></script>
+</body>
+
+</html>
