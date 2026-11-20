@@ -2,10 +2,10 @@
 const ESTUDIANTES = [
   { id: "1", nombre: "Valentina Rojas", grado: "8°", identificacion: "1023456789", progreso: 86, estado: "Al día" },
   { id: "2", nombre: "Juan Pablo Cárdenas", grado: "7°", identificacion: "1029876543", progreso: 58, estado: "En riesgo" },
-  { id: "3", nombre: "María Fernanda López", grado: "9°", identificacion: "1011223344", progreso: 74, estado: "Seguimiento" },
+  { id: "3", nombre: "María Fernanda López", grado: "6°", identificacion: "1011223344", progreso: 74, estado: "Seguimiento" },
   { id: "4", nombre: "Santiago Torres", grado: "8°", identificacion: "1033445566", progreso: 91, estado: "Al día" },
   { id: "5", nombre: "Isabella Gutiérrez", grado: "7°", identificacion: "1044556677", progreso: 63, estado: "Seguimiento" },
-  { id: "6", nombre: "Mateo Hernández", grado: "9°", identificacion: "1055667788", progreso: 47, estado: "En riesgo" }
+  { id: "6", nombre: "Mateo Hernández", grado: "6°", identificacion: "1055667788", progreso: 47, estado: "En riesgo" }
 ];
 
 const SEGUIMIENTOS = [
@@ -48,6 +48,27 @@ const SEGUIMIENTOS = [
 ];
 
 const ALERTAS = [
+  
+  {
+    id: "A-99",
+    titulo: "Mostrar alumnos con rendimiento medio",
+    mensaje: "",
+    destinatario: "Orientadora",
+    fecha: "2026-10-14",
+    tipo: "Automática",
+    leida: false
+  },
+  
+  {
+    id: "A-100",
+    titulo: "Mostrar alumnos con rendimiento bajo",
+    mensaje: "",
+    destinatario: "Orientadora",
+    fecha: "2026-10-14",
+    tipo: "Automática",
+    leida: false
+  },
+  
   {
     id: "A-101",
     titulo: "Estudiante en riesgo académico",
@@ -57,19 +78,11 @@ const ALERTAS = [
     tipo: "Automática",
     leida: false
   },
-  {
-    id: "A-102",
-    titulo: "Cita con acudiente",
-    mensaje: "Recordatorio: cita con la acudiente de Mateo Hernández mañana 8:00 a.m.",
-    destinatario: "Orientadora",
-    fecha: "2026-10-15",
-    tipo: "Manual",
-    leida: false
-  },
+  
   {
     id: "A-103",
-    titulo: "Nueva actividad asignada",
-    mensaje: "Se publicó el quiz 'Ecuaciones de primer grado' para grado 7°.",
+    titulo: "Nueva Actividad",
+    mensaje: "¡Felicitaciones! haz logrado superar los retos propuestos.",
     destinatario: "Estudiantes 7°",
     fecha: "2026-10-13",
     tipo: "Automática",
@@ -102,10 +115,12 @@ const ACTIVIDADES = [
 
 const PROGRESO_POR_MATERIA = [
   { materia: "Matemáticas", promedio: 62 },
-  { materia: "Lengua", promedio: 74 },
-  { materia: "Inglés", promedio: 68 },
+  { materia: "Español", promedio: 74 },
+  { materia: "Sistemas", promedio: 68 },
   { materia: "Ciencias", promedio: 79 },
   { materia: "Sociales", promedio: 81 },
-  { materia: "Música", promedio: 88 }
+  { materia: "Geometría", promedio: 80 },
+  { materia: "Libre", promedio: 70 },
+  { materia: "Artes", promedio: 41 }
 ];
 

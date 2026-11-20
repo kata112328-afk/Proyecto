@@ -93,7 +93,6 @@ function dibujarPanel() {
   const tarjetas = [
     { etiqueta: "Estudiantes", valor: ESTUDIANTES.length },
     { etiqueta: "En riesgo", valor: enRiesgo },
-    { etiqueta: "Seguimientos del mes", valor: estado.seguimientos.length },
     { etiqueta: "Actividades activas", valor: actividadesActivas }
   ];
 
@@ -380,9 +379,9 @@ function dibujarReportes() {
     "Estadísticas del progreso académico y generación de reportes (CU-07, CU-08).",
     `<select class="entrada ancho-corto" onchange="filtrarReportesPorGrado(this.value)">
         <option ${estado.filtroGradoReportes === "Todos" ? "selected" : ""}>Todos</option>
-        <option ${estado.filtroGradoReportes === "7°" ? "selected" : ""}>7°</option>
-        <option ${estado.filtroGradoReportes === "8°" ? "selected" : ""}>8°</option>
-        <option ${estado.filtroGradoReportes === "9°" ? "selected" : ""}>9°</option>
+        <option ${estado.filtroGradoReportes === "6°" ? "selected" : ""}>7°</option>
+        <option ${estado.filtroGradoReportes === "7°" ? "selected" : ""}>8°</option>
+        <option ${estado.filtroGradoReportes === "8°" ? "selected" : ""}>9°</option>
       </select>`
   )}
     <div class="cuadricula-reportes">
@@ -400,7 +399,8 @@ function dibujarReportes() {
       <h2 class="margen-abajo">Generar nuevo reporte</h2>
       <div class="rejilla-formulario">
         <select class="entrada">${opcionesEstudiantes}</select>
-        <select class="entrada"><option>Periodo 3 — 2026</option><option>Periodo 2 — 2026</option></select>
+        <select class="entrada"><option>Periodo 1 — 2027</option><option>Periodo 2 — 2027 </option><option>Periodo 3 — 2027</option></select>
+        <select class="entrada"><option>Periodo 1 — 2028</option><option>Periodo 2 — 2028 </option><option>Periodo 3 — 2028</option></select>
         <textarea rows="3" placeholder="Comentarios del reporte" class="entrada ancho-completo"></textarea>
       </div>
       <div class="fila margen-arriba">
@@ -415,7 +415,8 @@ function dibujarReportes() {
 function enviarNotificacion(evento) {
   evento.preventDefault();
   const datos = new FormData(evento.target);
-  const titulo = String(datos.get("titulo") || "").trim();
+  const titulo = String(datos.get("Buscar por.." ) || "").trim();
+
   if (!titulo) return;
   estado.alertas.unshift({
     id: `A-${100 + estado.alertas.length + 1}`,
@@ -428,7 +429,16 @@ function enviarNotificacion(evento) {
   });
   dibujar();
 }
+dibujar();
 
+  const estadoEl = document.getElementById("estado-notificacion");
+  if (estadoEl) {
+    estadoEl.textContent = "Envío exitoso";
+    estadoEl.style.display = "block";
+    setTimeout(() => {
+      estadoEl.style.display = "none";
+    }, 3000);
+  }
 function marcarLeida(id) {
   estado.alertas = estado.alertas.map((a) => (a.id === id ? { ...a, leida: true } : a));
   dibujar();
@@ -458,9 +468,16 @@ function dibujarAlertas() {
       <div class="tarjeta">
         <h2 class="margen-abajo">Nueva notificación</h2>
         <form class="columna-formulario" onsubmit="enviarNotificacion(event)">
-          <input name="titulo" placeholder="Título" class="entrada">
+          <select name="buscar Por.." class="entrada" required>
+  <option value="" disabled selected>Buscar por...</option>
+  <button type="submit" class="boton boton-primario">Enviar notificación</button>
+
+  <option value="Nombre">Nombre</option>
+  <option value="Documento">Documento</option>
+  <option value="Correo">Correo</option>
+</select>
           <select name="destinatario" class="entrada">
-            <option>Padres grado 7°</option><option>Padres grado 8°</option><option>Padres grado 9°</option><option>Coordinador</option><option>Estudiantes</option>
+            <option>Padres grado 6°</option><option>Padres grado 7°</option><option>Padres grado 8°</option><option>Coordinador</option><option>Estudiantes</option>
           </select>
           <textarea name="mensaje" rows="4" placeholder="Mensaje" class="entrada"></textarea>
           <button type="submit" class="boton boton-primario">Enviar notificación</button>
@@ -523,6 +540,11 @@ function dibujarActividades() {
         ${opcion("Académica", estado.filtroAreaActividades)}
         ${opcion("Tecnológica", estado.filtroAreaActividades)}
         ${opcion("Libre", estado.filtroAreaActividades)}
+      </select>
+      <select id="filtro-estado-act" class="entrada ancho-medio" onchange="filtrarActividades()">
+        ${opcion("Todos", estado.filtroEstadoActividades)}
+        ${opcion("Activa", estado.filtroEstadoActividades)}
+        ${opcion("Finalizada", estado.filtroEstadoActividades)} 
       </select>
     </div>
     <div class="cuadricula-actividades">${tarjetas}</div>`;
