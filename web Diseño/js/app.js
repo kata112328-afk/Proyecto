@@ -483,7 +483,7 @@ function dibujarActividades() {
     (a) =>
       (estado.filtroGradoActividades === "Todos" || a.grado === estado.filtroGradoActividades) &&
       (estado.filtroAreaActividades === "Todas" || a.area === estado.filtroAreaActividades)
-  );
+    );
 
   const opcion = (valor, actual) => `<option ${valor === actual ? "selected" : ""}>${valor}</option>`;
 
@@ -514,16 +514,15 @@ function dibujarActividades() {
     <div class="fila filtros margen-abajo">
       <select id="filtro-grado-act" class="entrada ancho-corto" onchange="filtrarActividades()">
         ${opcion("Todos", estado.filtroGradoActividades)}
+        ${opcion("6°", estado.filtroGradoActividades)}
         ${opcion("7°", estado.filtroGradoActividades)}
         ${opcion("8°", estado.filtroGradoActividades)}
-        ${opcion("9°", estado.filtroGradoActividades)}
       </select>
       <select id="filtro-area-act" class="entrada ancho-medio" onchange="filtrarActividades()">
         ${opcion("Todas", estado.filtroAreaActividades)}
         ${opcion("Académica", estado.filtroAreaActividades)}
-        ${opcion("Deportiva", estado.filtroAreaActividades)}
-        ${opcion("Musical", estado.filtroAreaActividades)}
         ${opcion("Tecnológica", estado.filtroAreaActividades)}
+        ${opcion("Libre", estado.filtroAreaActividades)}
       </select>
     </div>
     <div class="cuadricula-actividades">${tarjetas}</div>`;

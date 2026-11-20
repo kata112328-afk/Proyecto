@@ -88,10 +88,16 @@ const ALERTAS = [
 
 const ACTIVIDADES = [
   { id: "ACT-01", titulo: "Ecuaciones de primer grado", materia: "Matemáticas", grado: "7°", area: "Académica", preguntas: 10, completadaPor: 18, estado: "Activa" },
-  { id: "ACT-02", titulo: "Comprensión lectora: textos narrativos", materia: "Lengua castellana", grado: "8°", area: "Académica", preguntas: 8, completadaPor: 22, estado: "Activa" },
+  { id: "ACT-02", titulo: "Comprensión lectora: textos narrativos", materia: "Español", grado: "8°", area: "Académica", preguntas: 8, completadaPor: 22, estado: "Activa" },
   { id: "ACT-03", titulo: "Vocabulary quiz: daily routines", materia: "Inglés", grado: "7°", area: "Académica", preguntas: 12, completadaPor: 15, estado: "Activa" },
-  { id: "ACT-04", titulo: "Sistema solar y planetas", materia: "Ciencias naturales", grado: "9°", area: "Académica", preguntas: 10, completadaPor: 9, estado: "Borrador" },
-  { id: "ACT-05", titulo: "Ritmo y notas musicales", materia: "Música", grado: "8°", area: "Musical", preguntas: 6, completadaPor: 27, estado: "Activa" }
+  { id: "ACT-04", titulo: "Sistema solar y planetas", materia: "Ciencias", grado: "9°", area: "Académica", preguntas: 10, completadaPor: 9, estado: "Borrador" },
+  { id: "ACT-05", titulo: "Ritmo y notas musicales", materia: "Música", grado: "8°", area: "Musical", preguntas: 6, completadaPor: 27, estado: "Inactiva" },
+  { id: "ACT-06", titulo: "Geometría", materia: "Geometría", grado: "8°", area: "Académica", preguntas: 8, completadaPor: 37, estado: "Activa" },
+  { id: "ACT-07", titulo: "Historia de Colombia", materia: "Sociales", grado: "6°", area: "Académica", preguntas: 12, completadaPor: 17, estado: "Activa" },
+  { id: "ACT-08", titulo: "Apertura a la tecnologia", materia: "Sistemas", grado: "8°", area: "Tecnológica", preguntas: 16, completadaPor: 10, estado: "Activa" },
+  { id: "ACT-09", titulo: "Deportes", materia: "Educación Física", grado: "7°", area: "Libre", preguntas: 17, completadaPor: 4, estado: "Activa" },
+  { id: "ACT-10", titulo: "Expresion artistica", materia: "Artes", grado: "6°", area: "Libre", preguntas: 9, completadaPor: 11, estado: "Activa" }
+
 ];
 
 const PROGRESO_POR_MATERIA = [
@@ -102,3 +108,4 @@ const PROGRESO_POR_MATERIA = [
   { materia: "Sociales", promedio: 81 },
   { materia: "Música", promedio: 88 }
 ];
+
