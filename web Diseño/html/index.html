@@ -6,8 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BrainBro — Plataforma Educativa</title>
   <meta name="description"
-    content="BrainBro: plataforma de seguimiento académico y actividades educativas para orientadoras, coordinadores, estudiantes y padres.">
-  <link rel="icon" href="logo.png" type="image/png">
+    content="BrainBro: plataforma educativa para docentes, coordinación, estudiantes y familias.">
+  <link rel="icon" href="../imagen/logo.jpeg" type="image/jpeg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700;800&display=swap"
@@ -71,8 +71,8 @@
           <button type="submit" class="boton boton-primario boton-ancho">Ingresar a la plataforma</button>
         </form><br>
 
-        <button type="button" id="Abrir Registro" class="boton abrir registro">Registrarse</button>
-        <a href="#" class="enlace-centro">¿Olvidaste tu contraseña?</a>
+        <button type="button" id="abrir-registro" class="boton abrir registro">Registrarse</button>
+        <a href="#" id="abrir-recuperacion" class="enlace-centro">¿Olvidaste tu contraseña?</a>
         <div id="modalregistro" class="modal-oculto">
             <div class="modal-contenido">
               <div class="modal-header">
@@ -83,29 +83,35 @@
               <!-- Formulario de registro -->
               <form id="form-registro">
                 <div class="form-registro">
-                  <label>Nombre completo</label>
+                  <label for="nombre">Nombre completo</label>
                   <input class="entrada" type="text" id="nombre" name="nombre" placeholder="Nombre completo" required>
                 </div>
                 <div class="form-registro">
-                  <label>Documento</label>
-                  <input class="entrada" type="int" id="documento" placeholder="Documento" required>
+                  <label for="documento">Documento</label>
+                  <input class="entrada" type="text" id="documento" name="documento" inputmode="numeric" placeholder="Documento" required>
                 </div>
                 <div class="form-registro">
-                  <label>Grado</label>
-                  <input class="entrada" type="text" id="Grado" placeholder="Grado" required>
+                  <label for="grado">Grado</label>
+                  <select class="entrada" id="grado" name="grado" required>
+                    <option value="" selected disabled>Selecciona un grado</option>
+                    <option value="6°">6°</option>
+                    <option value="7°">7°</option>
+                    <option value="8°">8°</option>
+                    <option value="9°">9°</option>
+                  </select>
                 </div>
                 <div class="form-registro">
-                  <label>Correo electrónico</label>
-                  <input class="entrada" type="email" id="correo-registro" name="correo-registro" placeholder="correo@ejemplo.com">
+                  <label for="correo-registro">Correo electrónico</label>
+                  <input class="entrada" type="email" id="correo-registro" name="correo-registro" placeholder="correo@ejemplo.com" required>
                 </div>
                 <!-- CONTRASEÑA -->
                 <div class="form-registro">
-                  <label>Contraseña</label>
-                  <input class="entrada" type="password" id="password" placeholder="Minimo 8 caracteres" required>
+                  <label for="password">Contraseña</label>
+                  <input class="entrada" type="password" id="password" name="password" minlength="8" placeholder="Mínimo 8 caracteres" required>
                 </div>
                 <div class="form-registro">
-                  <label>Confirmar contraseña</label>
-                  <input class="entrada" type="password" id="confirmar password" placeholder="Repite tu contraseña" required>
+                  <label for="confirmar-clave">Confirmar contraseña</label>
+                  <input class="entrada" type="password" id="confirmar-clave" name="confirmar-clave" minlength="8" placeholder="Repite tu contraseña" required>
                 </div>
                 <button type="submit" class="Btn-registro">Guardar</button>
               </form>
@@ -117,6 +123,53 @@
             </div>
         </div>
 
+        <div id="modal-recuperacion" class="modal-oculto" aria-hidden="true">
+          <section class="modal-contenido modal-recuperacion-contenido" role="dialog" aria-modal="true" aria-labelledby="titulo-recuperacion">
+            <div class="modal-header">
+              <h2 id="titulo-recuperacion">Recuperar contraseña</h2>
+              <button type="button" id="cerrar-recuperacion" class="cerrar" aria-label="Cerrar">&times;</button>
+            </div>
+            <p class="recuperacion-intro">Sigue los pasos para restablecer el acceso a tu cuenta.</p>
+
+            <form id="form-recuperacion" novalidate>
+              <div id="paso-correo" class="paso-recuperacion">
+                <div class="campo recuperacion-campo">
+                  <label for="correo-recuperacion">Correo electrónico</label>
+                  <input id="correo-recuperacion" type="email" autocomplete="email" placeholder="nombre@colegio.edu.co" required>
+                </div>
+                <button type="button" id="enviar-codigo" class="boton boton-primario boton-ancho">Enviar código</button>
+              </div>
+
+              <div id="paso-codigo" class="paso-recuperacion oculto">
+                <p id="destino-codigo" class="destino-codigo"></p>
+                <div class="campo recuperacion-campo">
+                  <label for="codigo-recuperacion">Código de seis dígitos</label>
+                  <input id="codigo-recuperacion" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="[0-9]{6}" placeholder="000000">
+                </div>
+                <p id="temporizador-recuperacion" class="temporizador-recuperacion">El código vence en 03:00</p>
+                <button type="button" id="verificar-codigo" class="boton boton-primario boton-ancho">Verificar código</button>
+                <button type="button" id="reenviar-codigo" class="boton-reenviar">Generar otro código</button>
+              </div>
+
+              <div id="paso-nueva-clave" class="paso-recuperacion oculto">
+                <div class="campo recuperacion-campo">
+                  <label for="nueva-clave">Nueva contraseña</label>
+                  <input id="nueva-clave" type="password" autocomplete="new-password" minlength="8" placeholder="Mínimo 8 caracteres">
+                </div>
+                <div class="campo recuperacion-campo">
+                  <label for="confirmar-nueva-clave">Confirmar contraseña</label>
+                  <input id="confirmar-nueva-clave" type="password" autocomplete="new-password" minlength="8" placeholder="Escribe la contraseña otra vez">
+                </div>
+                <button type="submit" class="boton boton-primario boton-ancho">Guardar</button>
+              </div>
+            </form>
+
+            <p id="aviso-codigo-demo" class="aviso-codigo-demo oculto" role="status">Código de demostración: <strong id="codigo-demo"></strong></p>
+            <p id="mensaje-recuperacion" class="mensaje-recuperacion oculto" role="status" aria-live="polite"></p>
+            <button type="button" id="cerrar-exito-recuperacion" class="boton boton-primario boton-ancho oculto">Finalizar</button>
+          </section>
+        </div>
+
     </main>
   </div>
 
@@ -125,13 +178,13 @@
     <aside class="sidebar">
       <div class="sidebar-cabecera">
         <img src="../imagen/logo.jpeg" alt="Logo BrainBro" class="logo-chico">
-        <div>
-          <p class="marca-nombre oscuro chico">BrainBro</p>
-          <p class="sidebar-sub">Plataforma educativa</p>
-        </div>
       </div>
 
-      <nav class="sidebar-nav" id="menu-navegacion">
+      <button type="button" id="boton-menu" class="boton-menu" aria-label="Abrir menú principal" aria-expanded="false" aria-controls="menu-navegacion" title="Menú principal">
+        <span class="icono-casa" aria-hidden="true"><span class="casa-techo"></span><span class="casa-cuerpo"></span></span>
+      </button>
+
+      <nav class="sidebar-nav" id="menu-navegacion" aria-label="Menú principal">
         <button class="nav-item" data-vista="panel">Panel general</button>
         <button class="nav-item" data-vista="historial">Historial del estudiante</button>
         <button class="nav-item" data-vista="reportes">Reportes y progreso</button>
@@ -140,8 +193,6 @@
       </nav>
 
       <div class="sidebar-pie">
-        <p class="usuario-nombre">Elsa Junca</p>
-        <p class="usuario-rol">Orientadora</p>
         <a href="#" id="enlace-salir" class="enlace-salir">Cerrar sesión</a>
       </div>
     </aside>

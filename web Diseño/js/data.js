@@ -16,7 +16,7 @@ const SEGUIMIENTOS = [
     tipo: "Académico",
     descripcion: "Bajo desempeño en matemáticas reportado por el docente. Dificultad con ecuaciones de primer grado.",
     acciones: "Asignar actividades de refuerzo en BrainBro y cita con acudiente.",
-    registradoPor: "Orientadora"
+    registradoPor: "Equipo institucional"
   },
   {
     id: "S-002",
@@ -34,7 +34,7 @@ const SEGUIMIENTOS = [
     tipo: "Convivencia",
     descripcion: "Reporte de conflicto con compañeros en hora de descanso.",
     acciones: "Sesión de mediación programada para el 20 de octubre.",
-    registradoPor: "Orientadora"
+    registradoPor: "Equipo institucional"
   },
   {
     id: "S-004",
@@ -43,7 +43,7 @@ const SEGUIMIENTOS = [
     tipo: "Académico",
     descripcion: "Mejora notable en inglés tras completar actividades de la plataforma.",
     acciones: "Continuar plan de refuerzo. Reconocimiento en clase.",
-    registradoPor: "Orientadora"
+    registradoPor: "Equipo institucional"
   }
 ];
 
@@ -53,7 +53,7 @@ const ALERTAS = [
     id: "A-99",
     titulo: "Mostrar alumnos con rendimiento medio",
     mensaje: "",
-    destinatario: "Orientadora",
+    destinatario: "Equipo institucional",
     fecha: "2026-10-14",
     tipo: "Automática",
     leida: false
@@ -63,7 +63,7 @@ const ALERTAS = [
     id: "A-100",
     titulo: "Mostrar alumnos con rendimiento bajo",
     mensaje: "",
-    destinatario: "Orientadora",
+    destinatario: "Equipo institucional",
     fecha: "2026-10-14",
     tipo: "Automática",
     leida: false
@@ -73,7 +73,7 @@ const ALERTAS = [
     id: "A-101",
     titulo: "Estudiante en riesgo académico",
     mensaje: "Juan Pablo Cárdenas lleva 2 semanas con progreso inferior al 60%.",
-    destinatario: "Orientadora",
+    destinatario: "Equipo institucional",
     fecha: "2026-10-14",
     tipo: "Automática",
     leida: false

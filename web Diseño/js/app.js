@@ -10,8 +10,26 @@ const estado = {
   filtroAreaActividades: "Todas",
   formularioSeguimientoAbierto: false,
   mensajeSeguimiento: "",
-  reporteGuardado: false
+  reporteGuardado: false,
+  diapositivaCarrusel: 0,
+  mural: leerListaGuardada("brainbro-mural"),
+  eventos: leerListaGuardada("brainbro-eventos", ["27 de noviembre · Clausuras"]),
+  actividadSeleccionada: null,
+  quizPantalla: "portada",
+  respuestaSeleccionada: null,
+  respuestaComprobada: false,
+  puntuacionQuiz: 0
 };
+let temporizadorCarrusel = null;
+
+function leerListaGuardada(clave, valorInicial = []) {
+  try {
+    const datos = JSON.parse(localStorage.getItem(clave) || "null");
+    return Array.isArray(datos) ? datos : valorInicial;
+  } catch {
+    return valorInicial;
+  }
+}
 
 // ---------- Utilidades ----------
 
@@ -41,6 +59,8 @@ function tonoEstado(estado) {
 function mostrarLogin() {
   document.getElementById("pantalla-login").classList.remove("oculto");
   document.getElementById("pantalla-dashboard").classList.add("oculto");
+  clearInterval(temporizadorCarrusel);
+  temporizadorCarrusel = null;
 }
 
 function mostrarDashboard() {
@@ -51,10 +71,25 @@ function mostrarDashboard() {
 
 function navegar(vista) {
   estado.vista = vista;
+  const menu = document.getElementById("menu-navegacion");
+  const botonMenu = document.getElementById("boton-menu");
+  menu.classList.remove("abierto");
+  botonMenu.setAttribute("aria-expanded", "false");
   document.querySelectorAll("#menu-navegacion .nav-item").forEach((boton) => {
     boton.classList.toggle("activo", boton.dataset.vista === vista);
   });
   dibujar();
+  actualizarTemporizadorCarrusel();
+}
+
+function actualizarTemporizadorCarrusel() {
+  clearInterval(temporizadorCarrusel);
+  temporizadorCarrusel = null;
+  if (estado.vista !== "panel" || document.getElementById("pantalla-dashboard").classList.contains("oculto")) return;
+  temporizadorCarrusel = setInterval(() => {
+    estado.diapositivaCarrusel = (estado.diapositivaCarrusel + 1) % 3;
+    dibujar();
+  }, 60000);
 }
 
 function dibujar() {
@@ -86,63 +121,102 @@ function encabezado(titulo, subtitulo, accion) {
 // ---------- Panel general ----------
 
 function dibujarPanel() {
-  const enRiesgo = ESTUDIANTES.filter((e) => e.estado === "En riesgo").length;
-  const pendientes = estado.alertas.filter((a) => !a.leida).length;
-  const actividadesActivas = ACTIVIDADES.filter((a) => a.estado === "Activa").length;
-
-  const tarjetas = [
-    { etiqueta: "Estudiantes", valor: ESTUDIANTES.length },
-    { etiqueta: "En riesgo", valor: enRiesgo },
-    { etiqueta: "Actividades activas", valor: actividadesActivas }
+  const diapositivas = [
+    { titulo: "Nuestra comunidad", detalle: "Encuentros y actividades del colegio", imagen: "Screenshot_20220503-202202.jpg", alt: "Comunidad escolar reunida en el patio" },
+    { titulo: "Aprendizajes que nos unen", detalle: "Proyectos y experiencias escolares", imagen: "images5.jpg", alt: "Grupo de estudiantes y docentes" },
+    { titulo: "Momentos para recordar", detalle: "La vida diaria en nuestro colegio", imagen: "images4.jpg", alt: "Patio y edificio del colegio" }
   ];
-
-  const filas = ESTUDIANTES.map(
-    (e) => `
-    <tr>
-      <td class="celda-nombre">${escapar(e.nombre)}</td>
-      <td class="celda-gris">${escapar(e.grado)}</td>
-      <td>
-        <div class="celda-progreso">${barraProgreso(e.progreso)}<span class="celda-gris chico">${e.progreso}%</span></div>
-      </td>
-      <td>${insignia(e.estado, tonoEstado(e.estado))}</td>
-    </tr>`
-  ).join("");
-
-  const alertasRecientes = estado.alertas.slice(0, 3).map(
-    (a) => `
-    <li class="alerta-mini">
-      <p class="alerta-mini-titulo">${a.leida ? "" : '<span class="punto"></span>'}${escapar(a.titulo)}</p>
-      <p class="alerta-mini-mensaje">${escapar(a.mensaje)}</p>
-    </li>`
-  ).join("");
+  const equipo = Array.from({ length: 20 }, (_, indice) => `
+    <div class="cuadro-anuario" role="img" aria-label="Espacio ${indice + 1} de 20, foto pendiente">
+      <span aria-hidden="true">+</span><small>${String(indice + 1).padStart(2, "0")}</small>
+    </div>`).join("");
+  const publicaciones = (elementos) => elementos.map((texto) => `<li>${escapar(texto)}</li>`).join("");
 
   return `
-    ${encabezado("Buen día", `Tienes ${pendientes} alertas sin leer y ${enRiesgo} estudiantes en riesgo.`)}
-    <div class="cuadricula-estadisticas">
-      ${tarjetas.map((t) => `<div class="tarjeta"><p class="etiqueta">${t.etiqueta}</p><p class="valor">${t.valor}</p></div>`).join("")}
-    </div>
-    <div class="cuadricula-panel">
-      <div class="tarjeta panel-tabla">
-        <div class="titulo-fila">
-          <h2>Estudiantes</h2>
-          <button class="enlace" onclick="navegar('historial')">Ver historial</button>
+    <section class="panel-colegio">
+      <header class="cabecera-colegio">
+        <div>
+          <h1>Colegio Guillermo León Valencia</h1>
+          <p class="ubicacion-colegio">Engativá · Bogotá</p>
         </div>
-        <table class="tabla">
-          <thead><tr><th>Nombre</th><th>Grado</th><th>Progreso</th><th>Estado</th></tr></thead>
-          <tbody>${filas}</tbody>
-        </table>
+        <img class="escudo-colegio" src="../imagen/images3.jpg" alt="Escudo del Colegio Guillermo León Valencia">
+      </header>
+
+      <div class="portada-colegio">
+        <section class="panel-social panel-mural">
+          <div class="titulo-seccion-colegio"><div><p class="sobrelinea-colegio">Comunidad</p><h2>Mural</h2></div></div>
+          <form class="form-publicacion" onsubmit="guardarPublicacion(event, 'mural')">
+            <label class="solo-lectores" for="entrada-mural">Escribe en el mural</label>
+            <textarea id="entrada-mural" name="texto" rows="3" placeholder="Escribe un mensaje..." required></textarea>
+            <button type="submit" class="boton-anadir">Añadir</button>
+          </form>
+          <ul class="lista-publicaciones">${publicaciones(estado.mural)}</ul>
+        </section>
+
+        <section class="seccion-carrusel" aria-label="Galería del colegio">
+          <div class="titulo-seccion-colegio">
+            <div><p class="sobrelinea-colegio">Vida escolar</p><h2>Galería del colegio</h2></div>
+            <span class="contador-fotos">${estado.diapositivaCarrusel + 1} / ${diapositivas.length}</span>
+          </div>
+          <div class="carrusel-escenario" aria-live="polite">
+            ${diapositivas.map((diapositiva, indice) => `
+              <article class="diapositiva${indice === estado.diapositivaCarrusel ? " activa" : ""}" aria-hidden="${indice !== estado.diapositivaCarrusel}">
+                <img class="imagen-carrusel" src="../imagen/${diapositiva.imagen}" alt="${diapositiva.alt}" ${indice === estado.diapositivaCarrusel ? "fetchpriority=high" : "loading=lazy"}>
+                <div class="pie-diapositiva"><h3>${diapositiva.titulo}</h3><p>${diapositiva.detalle}</p></div>
+              </article>`).join("")}
+          </div>
+          <div class="controles-carrusel" aria-label="Controles del carrusel">
+            <button type="button" class="flecha-carrusel" onclick="irDiapositiva(${estado.diapositivaCarrusel - 1})" aria-label="Fotografía anterior">&#8592;</button>
+            <div class="puntos-carrusel" aria-label="Seleccionar fotografía">
+              ${diapositivas.map((_, indice) => `<button type="button" class="punto-carrusel${indice === estado.diapositivaCarrusel ? " activo" : ""}" onclick="irDiapositiva(${indice})" aria-label="Mostrar fotografía ${indice + 1}" aria-current="${indice === estado.diapositivaCarrusel ? "true" : "false"}"></button>`).join("")}
+            </div>
+            <button type="button" class="flecha-carrusel" onclick="irDiapositiva(${estado.diapositivaCarrusel + 1})" aria-label="Fotografía siguiente">&#8594;</button>
+          </div>
+        </section>
+
+        <aside class="columna-derecha">
+          <section class="panel-social panel-anuario">
+            <div class="titulo-seccion-colegio">
+              <div><p class="sobrelinea-colegio">Diseño anuario</p><h2>Equipo del colegio</h2></div>
+              <span class="contador-fotos">20 fotos</span>
+            </div>
+            <div class="cuadricula-anuario">${equipo}</div>
+          </section>
+
+          <section class="panel-social panel-eventos">
+            <div class="titulo-seccion-colegio"><div><p class="sobrelinea-colegio">Agenda escolar</p><h2>Eventos</h2></div></div>
+            <form class="form-publicacion" onsubmit="guardarPublicacion(event, 'eventos')">
+              <label class="solo-lectores" for="entrada-eventos">Añadir un evento</label>
+              <textarea id="entrada-eventos" name="texto" rows="2" placeholder="Escribe un evento..." required></textarea>
+              <button type="submit" class="boton-anadir">Añadir</button>
+            </form>
+            <ul class="lista-publicaciones">${publicaciones(estado.eventos)}</ul>
+          </section>
+        </aside>
       </div>
-      <div class="tarjeta">
-        <div class="titulo-fila">
-          <h2>Alertas recientes</h2>
-          <button class="enlace" onclick="navegar('alertas')">Ver todas</button>
-        </div>
-        <ul class="lista-alertas-mini">${alertasRecientes}</ul>
-      </div>
-    </div>`;
+    </section>`;
+}
+
+function guardarPublicacion(evento, tipo) {
+  evento.preventDefault();
+  const texto = String(new FormData(evento.target).get("texto") || "").trim();
+  const claves = { mural: "brainbro-mural", eventos: "brainbro-eventos" };
+  if (!texto || !claves[tipo]) return;
+
+  estado[tipo].unshift(texto);
+  try {
+    localStorage.setItem(claves[tipo], JSON.stringify(estado[tipo]));
+  } catch {}
+  dibujar();
+}
+
+function irDiapositiva(indice) {
+  const totalDiapositivas = 3;
+  estado.diapositivaCarrusel = (indice + totalDiapositivas) % totalDiapositivas;
+  dibujar();
 }
 const modalregistro = document.getElementById("modalregistro");
-const abrirregistro = document.getElementById("Abrir Registro");
+const abrirregistro = document.getElementById("abrir-registro");
 const cerrarregistro = document.getElementById("cerrar-registro");
 
 function mostrarregistro() {
@@ -166,13 +240,17 @@ modalregistro.addEventListener("click", function (evento) {
 
 document.addEventListener("keydown", function (evento) {
   if (evento.key === "Escape") {
-    cerrarModal();
+    if (modalRecuperacion.classList.contains("activo")) {
+      cerrarModalRecuperacion();
+    } else {
+      cerrarModal();
+    }
   }
 });
 
 document.getElementById("form-registro").addEventListener("submit", function (evento) {
   evento.preventDefault();
-  const password = document.getElementById("clave").value;
+  const password = document.getElementById("password").value;
   const confirmPassword = document.getElementById("confirmar-clave").value;
   if (password !== confirmPassword) {
     alert("Las contraseñas no coinciden. Por favor, inténtalo de nuevo.");
@@ -206,7 +284,7 @@ function guardarSeguimiento(evento) {
     tipo: String(datos.get("tipo")),
     descripcion: descripcion,
     acciones: acciones,
-    registradoPor: "Orientadora"
+    registradoPor: "Equipo institucional"
   });
   estado.mensajeSeguimiento = "Seguimiento registrado exitosamente.";
   estado.formularioSeguimientoAbierto = false;
@@ -495,7 +573,127 @@ function filtrarActividades() {
   dibujar();
 }
 
+const MATERIAS_VISUALES = {
+  "Matemáticas": { icono: "∑", estilo: "matematicas" },
+  "Español": { icono: "Aa", estilo: "espanol" },
+  "Inglés": { icono: "EN", estilo: "ingles" },
+  "Ciencias": { icono: "⚗", estilo: "ciencias" },
+  "Música": { icono: "♫", estilo: "musica" },
+  "Geometría": { icono: "△", estilo: "geometria" },
+  "Sociales": { icono: "◎", estilo: "sociales" },
+  "Sistemas": { icono: "⌘", estilo: "sistemas" },
+  "Educación Física": { icono: "⚽", estilo: "fisica" },
+  "Artes": { icono: "✿", estilo: "artes" }
+};
+
+const PREGUNTAS_DEMO = {
+  "ACT-01": { texto: "¿Cuál es el valor de x en la ecuación 2x + 4 = 12?", opciones: ["2", "4", "6", "8"], correcta: 1 },
+  "ACT-02": { texto: "¿Qué elemento suele contar los hechos de una narración?", opciones: ["El narrador", "El índice", "El glosario", "La portada"], correcta: 0 },
+  "ACT-03": { texto: "¿Qué significa la palabra inglesa ‘usually’?", opciones: ["Nunca", "A veces", "Usualmente", "Ayer"], correcta: 2 },
+  "ACT-04": { texto: "¿A qué temperatura hierve el agua al nivel del mar?", opciones: ["50 °C", "75 °C", "100 °C", "150 °C"], correcta: 2 },
+  "ACT-05": { texto: "En un compás de 4/4, ¿cuántos tiempos suele durar una negra?", opciones: ["1 tiempo", "2 tiempos", "3 tiempos", "4 tiempos"], correcta: 0 },
+  "ACT-06": { texto: "¿Cuánto suman los ángulos interiores de un triángulo?", opciones: ["90°", "180°", "270°", "360°"], correcta: 1 },
+  "ACT-07": { texto: "¿En qué fecha se conmemora el inicio del proceso de independencia de Colombia?", opciones: ["20 de julio de 1810", "7 de agosto de 1819", "12 de octubre de 1492", "11 de noviembre de 1811"], correcta: 0 },
+  "ACT-08": { texto: "¿Qué combinación de teclas se usa habitualmente para guardar un archivo?", opciones: ["Ctrl + P", "Ctrl + S", "Ctrl + Z", "Ctrl + X"], correcta: 1 },
+  "ACT-09": { texto: "¿Qué conviene hacer antes de iniciar una actividad física intensa?", opciones: ["Calentar el cuerpo", "Dejar de hidratarse", "Evitar moverse", "Contener la respiración"], correcta: 0 },
+  "ACT-10": { texto: "¿Cuáles son los colores primarios tradicionales en pintura?", opciones: ["Rojo, amarillo y azul", "Verde, naranja y violeta", "Negro, blanco y gris", "Rosa, café y turquesa"], correcta: 0 }
+};
+
+function abrirActividad(id) {
+  estado.actividadSeleccionada = ACTIVIDADES.find((actividad) => actividad.id === id);
+  estado.quizPantalla = "portada";
+  estado.respuestaSeleccionada = null;
+  estado.respuestaComprobada = false;
+  estado.puntuacionQuiz = 0;
+  dibujar();
+}
+
+function cerrarActividad() {
+  estado.actividadSeleccionada = null;
+  dibujar();
+}
+
+function empezarQuiz() {
+  estado.quizPantalla = "pregunta";
+  estado.respuestaSeleccionada = null;
+  estado.respuestaComprobada = false;
+  dibujar();
+}
+
+function seleccionarRespuesta(indice) {
+  if (estado.respuestaComprobada) return;
+  estado.respuestaSeleccionada = indice;
+  estado.respuestaComprobada = true;
+  if (indice === PREGUNTAS_DEMO[estado.actividadSeleccionada.id].correcta) {
+    estado.puntuacionQuiz += 1;
+  }
+  dibujar();
+}
+
+function dibujarExperienciaQuiz() {
+  const actividad = estado.actividadSeleccionada;
+  const visual = MATERIAS_VISUALES[actividad.materia] || { icono: "?", estilo: "default" };
+  const pregunta = PREGUNTAS_DEMO[actividad.id];
+
+  if (estado.quizPantalla === "resultado") {
+    const correcta = estado.puntuacionQuiz > 0;
+    return `
+      <section class="quiz-resultado">
+        <button type="button" class="boton-volver-quiz" onclick="cerrarActividad()">&#8592; Actividades</button>
+        <div class="resultado-caja ${correcta ? "resultado-correcto" : "resultado-reintentar"}">
+          <span class="resultado-icono">${correcta ? "★" : "↻"}</span>
+          <p class="etiqueta-vista-previa">Vista previa</p>
+          <h1>${correcta ? "¡Muy bien!" : "¡Sigue practicando!"}</h1>
+          <p>Resultado de demostración: ${estado.puntuacionQuiz} de 1 respuesta correcta.</p>
+          <button type="button" class="boton boton-primario" onclick="cerrarActividad()">Volver a actividades</button>
+        </div>
+      </section>`;
+  }
+
+  if (estado.quizPantalla === "portada") {
+    return `
+      <section class="quiz-experiencia">
+        <button type="button" class="boton-volver-quiz" onclick="cerrarActividad()">&#8592; Actividades</button>
+        <div class="portada-quiz materia-${visual.estilo}">
+          <div class="portada-quiz-ilustracion" role="img" aria-label="Ilustración de ${escapar(actividad.materia)}">${visual.icono}</div>
+          <p class="etiqueta-vista-previa">Vista previa · ${escapar(actividad.materia)}</p>
+          <h1>${escapar(actividad.titulo)}</h1>
+          <p class="portada-quiz-detalle">Grado ${escapar(actividad.grado)} · 1 pregunta de demostración</p>
+          <button type="button" class="boton-empezar-quiz" onclick="empezarQuiz()">Empezar</button>
+        </div>
+      </section>`;
+  }
+
+  return `
+    <section class="quiz-experiencia">
+      <div class="cabecera-quiz">
+        <button type="button" class="boton-volver-quiz" onclick="cerrarActividad()">&#8592; Salir</button>
+        <div class="quiz-materia"><span class="quiz-icono-mini materia-${visual.estilo}">${visual.icono}</span><span>${escapar(actividad.materia)}</span></div>
+        <span class="quiz-progreso">1 / 1</span>
+      </div>
+      <div class="pregunta-quiz">
+        <p class="etiqueta-vista-previa">Pregunta de demostración</p>
+        <h1>${escapar(pregunta.texto)}</h1>
+      </div>
+      <div class="respuestas-quiz" role="group" aria-label="Selecciona una respuesta">
+        ${pregunta.opciones.map((opcion, indice) => {
+          let clase = "";
+          if (estado.respuestaComprobada && indice === pregunta.correcta) clase = "respuesta-correcta";
+          else if (estado.respuestaSeleccionada === indice) clase = "respuesta-incorrecta";
+          return `<button type="button" class="respuesta-quiz ${clase}" onclick="seleccionarRespuesta(${indice})" ${estado.respuestaComprobada ? "disabled" : ""}>${escapar(opcion)}</button>`;
+        }).join("")}
+      </div>
+      ${estado.respuestaComprobada ? `
+        <div class="pie-quiz">
+          <p class="retroalimentacion-quiz ${estado.respuestaSeleccionada === pregunta.correcta ? "correcta" : "incorrecta"}">${estado.respuestaSeleccionada === pregunta.correcta ? "¡Respuesta correcta!" : `La respuesta correcta es: ${escapar(pregunta.opciones[pregunta.correcta])}`}</p>
+          <button type="button" class="boton boton-primario" onclick="estado.quizPantalla = 'resultado'; dibujar()">Ver resultado</button>
+        </div>` : ""}
+    </section>`;
+}
+
 function dibujarActividades() {
+  if (estado.actividadSeleccionada) return dibujarExperienciaQuiz();
+
   const lista = ACTIVIDADES.filter(
     (a) =>
       (estado.filtroGradoActividades === "Todos" || a.grado === estado.filtroGradoActividades) &&
@@ -509,6 +707,9 @@ function dibujarActividades() {
     : lista.map(
       (a) => `
         <div class="tarjeta tarjeta-actividad">
+          <div class="imagen-materia materia-${(MATERIAS_VISUALES[a.materia] || { estilo: "default" }).estilo}" role="img" aria-label="Ilustración de ${escapar(a.materia)}">
+            <span>${(MATERIAS_VISUALES[a.materia] || { icono: "?" }).icono}</span>
+          </div>
           <div class="fila-espaciada">
             <span class="materia">${escapar(a.materia)}</span>
             ${insignia(a.estado, a.estado === "Activa" ? "ok" : "neutral")}
@@ -519,6 +720,7 @@ function dibujarActividades() {
             <div><p class="negrita">${a.preguntas}</p><p class="celda-gris chico">preguntas</p></div>
             <div><p class="negrita">${a.completadaPor}</p><p class="celda-gris chico">la completaron</p></div>
           </div>
+          <button type="button" class="boton boton-primario boton-ancho boton-ingresar-quiz" onclick="abrirActividad('${escapar(a.id)}')">Ingresar</button>
         </div>`
     ).join("");
 
@@ -574,4 +776,180 @@ document.getElementById("enlace-salir").addEventListener("click", (evento) => {
 
 document.querySelectorAll("#menu-navegacion .nav-item").forEach((boton) => {
   boton.addEventListener("click", () => navegar(boton.dataset.vista));
+});
+
+const botonMenu = document.getElementById("boton-menu");
+const menuNavegacion = document.getElementById("menu-navegacion");
+
+botonMenu.addEventListener("click", () => {
+  const abierto = menuNavegacion.classList.toggle("abierto");
+  botonMenu.setAttribute("aria-expanded", String(abierto));
+});
+
+document.addEventListener("click", (evento) => {
+  if (!menuNavegacion.contains(evento.target) && !botonMenu.contains(evento.target)) {
+    menuNavegacion.classList.remove("abierto");
+    botonMenu.setAttribute("aria-expanded", "false");
+  }
+});
+
+const modalRecuperacion = document.getElementById("modal-recuperacion");
+const formularioRecuperacion = document.getElementById("form-recuperacion");
+let codigoRecuperacion = "";
+let correoRecuperacion = "";
+let vencimientoCodigo = 0;
+let intentosCodigo = 0;
+let codigoVerificado = false;
+let intervaloCodigo = null;
+
+function mostrarPasoRecuperacion(pasoActivo) {
+  ["correo", "codigo", "nueva-clave"].forEach((paso) => {
+    document.getElementById(`paso-${paso}`).classList.toggle("oculto", paso !== pasoActivo);
+  });
+}
+
+function mostrarMensajeRecuperacion(texto, tipo) {
+  const mensaje = document.getElementById("mensaje-recuperacion");
+  mensaje.textContent = texto;
+  mensaje.classList.remove("oculto", "error", "exito");
+  mensaje.classList.add(tipo);
+}
+
+function actualizarCuentaRegresiva() {
+  const restante = vencimientoCodigo - Date.now();
+  const temporizador = document.getElementById("temporizador-recuperacion");
+  if (restante <= 0) {
+    clearInterval(intervaloCodigo);
+    intervaloCodigo = null;
+    document.getElementById("codigo-recuperacion").disabled = true;
+    document.getElementById("verificar-codigo").disabled = true;
+    temporizador.textContent = "El código venció. Genera uno nuevo para continuar.";
+    mostrarMensajeRecuperacion("El tiempo terminó. Solicita otro código.", "error");
+    return;
+  }
+
+  const segundos = Math.ceil(restante / 1000);
+  const minutosTexto = String(Math.floor(segundos / 60)).padStart(2, "0");
+  const segundosTexto = String(segundos % 60).padStart(2, "0");
+  temporizador.textContent = `El código vence en ${minutosTexto}:${segundosTexto}`;
+}
+
+function generarCodigoDeDemostracion() {
+  codigoRecuperacion = String(Math.floor(100000 + Math.random() * 900000));
+  vencimientoCodigo = Date.now() + 3 * 60 * 1000;
+  intentosCodigo = 0;
+  codigoVerificado = false;
+  document.getElementById("codigo-demo").textContent = codigoRecuperacion;
+  document.getElementById("aviso-codigo-demo").classList.remove("oculto");
+  document.getElementById("codigo-recuperacion").value = "";
+  document.getElementById("codigo-recuperacion").disabled = false;
+  document.getElementById("verificar-codigo").disabled = false;
+  document.getElementById("mensaje-recuperacion").classList.add("oculto");
+  mostrarPasoRecuperacion("codigo");
+  actualizarCuentaRegresiva();
+  clearInterval(intervaloCodigo);
+  intervaloCodigo = setInterval(actualizarCuentaRegresiva, 1000);
+}
+
+function abrirModalRecuperacion(evento) {
+  evento.preventDefault();
+  limpiarRecuperacion();
+  modalRecuperacion.classList.add("activo");
+  modalRecuperacion.setAttribute("aria-hidden", "false");
+  document.body.style.overflow = "hidden";
+  document.getElementById("correo-recuperacion").focus();
+}
+
+function limpiarRecuperacion() {
+  clearInterval(intervaloCodigo);
+  intervaloCodigo = null;
+  formularioRecuperacion.reset();
+  codigoRecuperacion = "";
+  correoRecuperacion = "";
+  vencimientoCodigo = 0;
+  intentosCodigo = 0;
+  codigoVerificado = false;
+  mostrarPasoRecuperacion("correo");
+  document.getElementById("aviso-codigo-demo").classList.add("oculto");
+  document.getElementById("mensaje-recuperacion").classList.add("oculto");
+  document.getElementById("cerrar-exito-recuperacion").classList.add("oculto");
+}
+
+function cerrarModalRecuperacion() {
+  modalRecuperacion.classList.remove("activo");
+  modalRecuperacion.setAttribute("aria-hidden", "true");
+  document.body.style.overflow = "";
+  limpiarRecuperacion();
+}
+
+document.getElementById("abrir-recuperacion").addEventListener("click", abrirModalRecuperacion);
+document.getElementById("cerrar-recuperacion").addEventListener("click", cerrarModalRecuperacion);
+document.getElementById("cerrar-exito-recuperacion").addEventListener("click", cerrarModalRecuperacion);
+
+modalRecuperacion.addEventListener("click", (evento) => {
+  if (evento.target === modalRecuperacion) cerrarModalRecuperacion();
+});
+
+document.getElementById("enviar-codigo").addEventListener("click", () => {
+  const correo = document.getElementById("correo-recuperacion");
+  if (!correo.checkValidity()) {
+    correo.reportValidity();
+    return;
+  }
+  correoRecuperacion = correo.value.trim();
+  generarCodigoDeDemostracion();
+});
+
+document.getElementById("reenviar-codigo").addEventListener("click", generarCodigoDeDemostracion);
+
+document.getElementById("verificar-codigo").addEventListener("click", () => {
+  const entradaCodigo = document.getElementById("codigo-recuperacion");
+  if (Date.now() >= vencimientoCodigo) {
+    actualizarCuentaRegresiva();
+    return;
+  }
+  if (!/^\d{6}$/.test(entradaCodigo.value.trim())) {
+    mostrarMensajeRecuperacion("Escribe los seis dígitos del código.", "error");
+    return;
+  }
+  if (entradaCodigo.value.trim() !== codigoRecuperacion) {
+    intentosCodigo += 1;
+    const restantes = 5 - intentosCodigo;
+    if (restantes <= 0) {
+      clearInterval(intervaloCodigo);
+      intervaloCodigo = null;
+      entradaCodigo.disabled = true;
+      document.getElementById("verificar-codigo").disabled = true;
+      mostrarMensajeRecuperacion("Se agotaron los intentos. Genera un código nuevo.", "error");
+      return;
+    }
+    mostrarMensajeRecuperacion(`El código no coincide. Te quedan ${restantes} intentos.`, "error");
+    return;
+  }
+
+  codigoVerificado = true;
+  clearInterval(intervaloCodigo);
+  intervaloCodigo = null;
+  document.getElementById("aviso-codigo-demo").classList.add("oculto");
+  document.getElementById("destino-codigo").textContent = `Correo verificado: ${correoRecuperacion}`;
+  document.getElementById("mensaje-recuperacion").classList.add("oculto");
+  mostrarPasoRecuperacion("nueva-clave");
+  document.getElementById("nueva-clave").focus();
+});
+
+formularioRecuperacion.addEventListener("submit", (evento) => {
+  evento.preventDefault();
+  const nuevaClave = document.getElementById("nueva-clave").value;
+  const confirmarClave = document.getElementById("confirmar-nueva-clave").value;
+  if (!codigoVerificado) {
+    mostrarMensajeRecuperacion("Primero verifica el código.", "error");
+  } else if (nuevaClave.length < 8) {
+    mostrarMensajeRecuperacion("La contraseña debe tener al menos 8 caracteres.", "error");
+  } else if (nuevaClave !== confirmarClave) {
+    mostrarMensajeRecuperacion("Las contraseñas no coinciden.", "error");
+  } else {
+    mostrarPasoRecuperacion("");
+    mostrarMensajeRecuperacion(`Demostración completada. Al conectar el backend, se actualizará la cuenta y se avisará a ${correoRecuperacion}.`, "exito");
+    document.getElementById("cerrar-exito-recuperacion").classList.remove("oculto");
+  }
 });
